@@ -1,4 +1,4 @@
-// Add search bar to navigation
+// Set up navigation behavior
 const nav = document.querySelector('nav');
 const navMenu = nav ? nav.querySelector('ul') : null;
 
@@ -36,7 +36,7 @@ if (nav && navMenu) {
 
 const searchBar = document.createElement('div');
 searchBar.className = 'search-bar';
-searchBar.innerHTML = '<label for="search-input" style="display: none;">Search articles</label><input type="text" placeholder="Search articles..." id="search-input">';
+searchBar.innerHTML = '<button type="button" class="search-toggle-btn" aria-label="Open search" aria-expanded="false"><i class="fas fa-search" aria-hidden="true"></i></button><div class="search-field-wrap"><label for="search-input" style="display: none;">Search articles</label><input type="text" id="search-input" placeholder="Search articles..."></div>';
 nav.appendChild(searchBar);
 
 // Add dark mode toggle button
@@ -53,21 +53,41 @@ backToTopBtn.innerHTML = '&#8679;'; // Up arrow
 backToTopBtn.setAttribute('aria-label', 'Back to top');
 document.body.appendChild(backToTopBtn);
 
-// Search functionality
+const searchToggleBtn = document.querySelector('.search-toggle-btn');
 const searchInput = document.getElementById('search-input');
-const articles = document.querySelectorAll('.blog-feed article');
+const blogArticles = document.querySelectorAll('.blog-feed article');
 
-searchInput.addEventListener('input', function() {
-    const query = this.value.toLowerCase();
-    articles.forEach(article => {
-        const title = article.querySelector('h2').textContent.toLowerCase();
-        if (title.includes(query)) {
-            article.style.display = 'block';
-        } else {
-            article.style.display = 'none';
+function filterBlogArticles(query) {
+    const normalizedQuery = query.toLowerCase();
+    blogArticles.forEach(article => {
+        const titleElement = article.querySelector('h2');
+        const title = titleElement ? titleElement.textContent.toLowerCase() : '';
+        article.style.display = title.includes(normalizedQuery) ? 'block' : 'none';
+    });
+}
+
+if (searchToggleBtn && searchInput) {
+    searchToggleBtn.addEventListener('click', function() {
+        const isOpen = searchBar.classList.toggle('open');
+        this.setAttribute('aria-expanded', isOpen.toString());
+
+        if (isOpen) {
+            searchInput.focus();
         }
     });
-});
+
+    searchInput.addEventListener('input', function() {
+        filterBlogArticles(this.value);
+    });
+
+    searchInput.addEventListener('keydown', function(event) {
+        if (event.key === 'Escape') {
+            searchBar.classList.remove('open');
+            searchToggleBtn.setAttribute('aria-expanded', 'false');
+            this.blur();
+        }
+    });
+}
 
 // Dark mode toggle
 darkModeToggle.addEventListener('click', function() {
