@@ -11,6 +11,11 @@ if (nav && navMenu) {
     menuToggle.innerHTML = '<span></span><span></span><span></span>';
     nav.insertBefore(menuToggle, navMenu);
 
+    const menuSearchItem = document.createElement('li');
+    menuSearchItem.className = 'menu-search-item';
+    menuSearchItem.innerHTML = '<button type="button" class="menu-search-btn" aria-label="Open search from menu"><i class="fas fa-search" aria-hidden="true"></i> Search</button>';
+    navMenu.appendChild(menuSearchItem);
+
     menuToggle.addEventListener('click', function() {
         const isOpen = nav.classList.toggle('mobile-open');
         this.setAttribute('aria-expanded', isOpen.toString());
@@ -36,15 +41,8 @@ if (nav && navMenu) {
 
 const searchBar = document.createElement('div');
 searchBar.className = 'search-bar';
-searchBar.innerHTML = '<button type="button" class="search-toggle-btn" aria-label="Open search" aria-expanded="false"><i class="fas fa-search" aria-hidden="true"></i></button><div class="search-field-wrap"><label for="search-input" style="display: none;">Search articles</label><input type="text" id="search-input" placeholder="Search articles..."></div>';
+searchBar.innerHTML = '<button type="button" class="search-toggle-btn" aria-label="Open search" aria-expanded="false"><i class="fas fa-search" aria-hidden="true"></i></button><div class="search-field-wrap"><label for="search-input" style="display: none;">Search articles</label><input type="text" id="search-input" placeholder="Search articles..."><ul id="search-suggestions" class="search-suggestions" role="listbox" aria-label="Article suggestions"></ul></div>';
 nav.appendChild(searchBar);
-
-// Add dark mode toggle button
-const darkModeToggle = document.createElement('button');
-darkModeToggle.className = 'dark-mode-toggle';
-darkModeToggle.textContent = 'Toggle Dark Mode';
-darkModeToggle.setAttribute('aria-pressed', 'false');
-nav.appendChild(darkModeToggle);
 
 // Add back to top button
 const backToTopBtn = document.createElement('button');
@@ -55,7 +53,71 @@ document.body.appendChild(backToTopBtn);
 
 const searchToggleBtn = document.querySelector('.search-toggle-btn');
 const searchInput = document.getElementById('search-input');
+const searchSuggestions = document.getElementById('search-suggestions');
+const menuSearchBtn = document.querySelector('.menu-search-btn');
 const blogArticles = document.querySelectorAll('.blog-feed article');
+
+const fallbackArticles = [
+    {
+        title: 'UCC Admissions Portal Open for 2026/2027 Undergraduate Applications',
+        url: 'University Update.html#ucc-admissions-2026-2027'
+    },
+    {
+        title: '8,200 New Education Jobs Open as GES Recruitment Drive Begins',
+        url: 'GES update.html#new-teacher-recruitment-2026'
+    },
+    {
+        title: 'Priority for Rural Service: Why Willingness to Serve in Deprived Areas Could Boost Your Chances',
+        url: 'GES update.html#new-teacher-recruitment-2026'
+    }
+];
+
+function getSearchableArticles() {
+    const entries = [];
+    const seen = new Set();
+
+    document.querySelectorAll('.blog-feed article').forEach(function(article) {
+        const titleEl = article.querySelector('h2');
+        const linkEl = article.querySelector('a[href*="update"], a[href*="Update"], a[href]');
+        if (!titleEl || !linkEl) {
+            return;
+        }
+
+        const title = titleEl.textContent.trim();
+        const url = linkEl.getAttribute('href');
+        const key = `${title}|${url}`;
+        if (!seen.has(key)) {
+            seen.add(key);
+            entries.push({ title, url });
+        }
+    });
+
+    document.querySelectorAll('.sidebar a, .related-posts a').forEach(function(link) {
+        const title = link.textContent.trim();
+        const url = link.getAttribute('href');
+        if (!title || !url) {
+            return;
+        }
+
+        const key = `${title}|${url}`;
+        if (!seen.has(key)) {
+            seen.add(key);
+            entries.push({ title, url });
+        }
+    });
+
+    fallbackArticles.forEach(function(item) {
+        const key = `${item.title}|${item.url}`;
+        if (!seen.has(key)) {
+            seen.add(key);
+            entries.push(item);
+        }
+    });
+
+    return entries;
+}
+
+const searchableArticles = getSearchableArticles();
 
 function filterBlogArticles(query) {
     const normalizedQuery = query.toLowerCase();
@@ -66,6 +128,50 @@ function filterBlogArticles(query) {
     });
 }
 
+function hideSuggestions() {
+    if (!searchSuggestions) {
+        return;
+    }
+
+    searchSuggestions.innerHTML = '';
+    searchSuggestions.classList.remove('show');
+}
+
+function renderSearchSuggestions(query) {
+    if (!searchSuggestions) {
+        return;
+    }
+
+    const normalizedQuery = query.trim().toLowerCase();
+    if (!normalizedQuery) {
+        hideSuggestions();
+        return;
+    }
+
+    const matches = searchableArticles
+        .filter(function(item) {
+            return item.title.toLowerCase().includes(normalizedQuery);
+        })
+        .slice(0, 6);
+
+    if (matches.length === 0) {
+        hideSuggestions();
+        return;
+    }
+
+    searchSuggestions.innerHTML = '';
+    matches.forEach(function(item) {
+        const listItem = document.createElement('li');
+        const link = document.createElement('a');
+        link.href = item.url;
+        link.textContent = item.title;
+        link.setAttribute('role', 'option');
+        listItem.appendChild(link);
+        searchSuggestions.appendChild(listItem);
+    });
+    searchSuggestions.classList.add('show');
+}
+
 if (searchToggleBtn && searchInput) {
     searchToggleBtn.addEventListener('click', function() {
         const isOpen = searchBar.classList.toggle('open');
@@ -73,28 +179,52 @@ if (searchToggleBtn && searchInput) {
 
         if (isOpen) {
             searchInput.focus();
+        } else {
+            hideSuggestions();
         }
     });
 
     searchInput.addEventListener('input', function() {
         filterBlogArticles(this.value);
+        renderSearchSuggestions(this.value);
     });
 
     searchInput.addEventListener('keydown', function(event) {
         if (event.key === 'Escape') {
             searchBar.classList.remove('open');
             searchToggleBtn.setAttribute('aria-expanded', 'false');
+            hideSuggestions();
             this.blur();
         }
-    });
-}
 
-// Dark mode toggle
-darkModeToggle.addEventListener('click', function() {
-    document.body.classList.toggle('dark-mode');
-    const isPressed = document.body.classList.contains('dark-mode');
-    this.setAttribute('aria-pressed', isPressed.toString());
-});
+        if (event.key === 'Enter' && searchSuggestions && searchSuggestions.firstElementChild) {
+            const firstSuggestion = searchSuggestions.firstElementChild.querySelector('a');
+            if (firstSuggestion) {
+                window.location.href = firstSuggestion.getAttribute('href');
+            }
+        }
+    });
+
+    document.addEventListener('click', function(event) {
+        if (!searchBar.contains(event.target)) {
+            hideSuggestions();
+        }
+    });
+
+    if (menuSearchBtn && nav) {
+        menuSearchBtn.addEventListener('click', function() {
+            searchBar.classList.add('open');
+            searchToggleBtn.setAttribute('aria-expanded', 'true');
+            searchInput.focus();
+            nav.classList.remove('mobile-open');
+
+            const menuToggleBtn = nav.querySelector('.menu-toggle');
+            if (menuToggleBtn) {
+                menuToggleBtn.setAttribute('aria-expanded', 'false');
+            }
+        });
+    }
+}
 
 // Back to top functionality
 window.addEventListener('scroll', function() {
@@ -116,17 +246,190 @@ backToTopBtn.addEventListener('click', function() {
 const resourceSearch = document.getElementById('resource-search');
 if (resourceSearch) {
     const resourceCards = document.querySelectorAll('.resource-card');
+    const suggestionsList = document.createElement('ul');
+    suggestionsList.className = 'resource-suggestions';
+    suggestionsList.setAttribute('role', 'listbox');
+    suggestionsList.setAttribute('aria-label', 'Resource suggestions');
+    resourceSearch.insertAdjacentElement('afterend', suggestionsList);
+
+    const nestedResourceEntries = [
+        {
+            title: 'Kindergarten - Term one lesson plan',
+            searchText: 'kindergarten kg term one lesson plan',
+            href: 'Teaching resources.html#kg-term1',
+            parentTitle: 'Teaching Resources'
+        },
+        {
+            title: 'Kindergarten - Term two lesson plan',
+            searchText: 'kindergarten kg term two lesson plan',
+            href: 'Teaching resources.html#kg-term2',
+            parentTitle: 'Teaching Resources'
+        },
+        {
+            title: 'Kindergarten - Term three lesson plan',
+            searchText: 'kindergarten kg term three lesson plan',
+            href: 'Teaching resources.html#kg-term3',
+            parentTitle: 'Teaching Resources'
+        },
+        {
+            title: 'Lower Primary - Term one lesson plan',
+            searchText: 'lower primary lp term one lesson plan',
+            href: 'Teaching resources.html#lp-term1',
+            parentTitle: 'Teaching Resources'
+        },
+        {
+            title: 'Lower Primary - Term two lesson plan',
+            searchText: 'lower primary lp term two lesson plan',
+            href: 'Teaching resources.html#lp-term2',
+            parentTitle: 'Teaching Resources'
+        },
+        {
+            title: 'Lower Primary - Term three lesson plan',
+            searchText: 'lower primary lp term three lesson plan',
+            href: 'Teaching resources.html#lp-term3',
+            parentTitle: 'Teaching Resources'
+        },
+        {
+            title: 'Upper Primary - Term one lesson plan',
+            searchText: 'upper primary up term one lesson plan',
+            href: 'Teaching resources.html#up-term1',
+            parentTitle: 'Teaching Resources'
+        },
+        {
+            title: 'Upper Primary - Term two lesson plan',
+            searchText: 'upper primary up term two lesson plan',
+            href: 'Teaching resources.html#up-term2',
+            parentTitle: 'Teaching Resources'
+        },
+        {
+            title: 'Upper Primary - Term three lesson plan',
+            searchText: 'upper primary up term three lesson plan',
+            href: 'Teaching resources.html#up-term3',
+            parentTitle: 'Teaching Resources'
+        },
+        {
+            title: 'JHS - Term one lesson plan',
+            searchText: 'jhs term one lesson plan',
+            href: 'Teaching resources.html#jhs-term1',
+            parentTitle: 'Teaching Resources'
+        },
+        {
+            title: 'JHS - Term two lesson plan',
+            searchText: 'jhs term two lesson plan',
+            href: 'Teaching resources.html#jhs-term2',
+            parentTitle: 'Teaching Resources'
+        },
+        {
+            title: 'JHS - Term three lesson plan',
+            searchText: 'jhs term three lesson plan',
+            href: 'Teaching resources.html#jhs-term3',
+            parentTitle: 'Teaching Resources'
+        }
+    ];
+
+    function hideResourceSuggestions() {
+        suggestionsList.innerHTML = '';
+        suggestionsList.classList.remove('show');
+    }
+
+    function renderResourceSuggestions(query) {
+        const normalizedQuery = query.trim().toLowerCase();
+        if (!normalizedQuery) {
+            hideResourceSuggestions();
+            return;
+        }
+
+        const matchedResources = [];
+        resourceCards.forEach(function(card) {
+            const titleEl = card.querySelector('h3');
+            const descEl = card.querySelector('p');
+            const linkEl = card.querySelector('a');
+            if (!titleEl || !descEl || !linkEl) {
+                return;
+            }
+
+            const title = titleEl.textContent.trim();
+            const description = descEl.textContent.trim();
+            const href = linkEl.getAttribute('href');
+            const matches = title.toLowerCase().includes(normalizedQuery) || description.toLowerCase().includes(normalizedQuery);
+
+            if (matches) {
+                matchedResources.push({ title, href });
+            }
+        });
+
+        nestedResourceEntries.forEach(function(item) {
+            if (item.searchText.includes(normalizedQuery) || item.title.toLowerCase().includes(normalizedQuery)) {
+                matchedResources.push({ title: item.title, href: item.href });
+            }
+        });
+
+        if (matchedResources.length === 0) {
+            hideResourceSuggestions();
+            return;
+        }
+
+        const uniqueResources = [];
+        const seen = new Set();
+        matchedResources.forEach(function(item) {
+            const key = `${item.title}|${item.href}`;
+            if (!seen.has(key)) {
+                seen.add(key);
+                uniqueResources.push(item);
+            }
+        });
+
+        suggestionsList.innerHTML = '';
+        uniqueResources.slice(0, 6).forEach(function(resource) {
+            const listItem = document.createElement('li');
+            const link = document.createElement('a');
+            link.href = resource.href;
+            link.textContent = resource.title;
+            link.setAttribute('role', 'option');
+            listItem.appendChild(link);
+            suggestionsList.appendChild(listItem);
+        });
+
+        suggestionsList.classList.add('show');
+    }
+
     resourceSearch.addEventListener('input', function() {
-        const query = this.value.toLowerCase();
+        const query = this.value.toLowerCase().trim();
         resourceCards.forEach(card => {
             const title = card.querySelector('h3').textContent.toLowerCase();
             const desc = card.querySelector('p').textContent.toLowerCase();
-            if (title.includes(query) || desc.includes(query)) {
+            const nestedMatch = nestedResourceEntries.some(function(item) {
+                return item.parentTitle.toLowerCase() === title && (item.searchText.includes(query) || item.title.toLowerCase().includes(query));
+            });
+
+            if (!query || title.includes(query) || desc.includes(query) || nestedMatch) {
                 card.style.display = 'block';
             } else {
                 card.style.display = 'none';
             }
         });
+
+        renderResourceSuggestions(this.value);
+    });
+
+    resourceSearch.addEventListener('keydown', function(event) {
+        if (event.key === 'Escape') {
+            hideResourceSuggestions();
+            this.blur();
+        }
+
+        if (event.key === 'Enter' && suggestionsList.firstElementChild) {
+            const firstSuggestion = suggestionsList.firstElementChild.querySelector('a');
+            if (firstSuggestion) {
+                window.location.href = firstSuggestion.getAttribute('href');
+            }
+        }
+    });
+
+    document.addEventListener('click', function(event) {
+        if (!resourceSearch.parentElement.contains(event.target)) {
+            hideResourceSuggestions();
+        }
     });
 }
 
@@ -144,27 +447,51 @@ if (facebookShare) {
 
 // Hero background slideshow
 const heroSection = document.querySelector('.hero');
-const images = [
-    'images/BingWallpaper.jpg',
-    'images/pexels-alaritammsalu-36078146.jpg',
-    'images/pexels-droosmo-2982449.jpg',
-    'images/pexels-hujason-29461071.jpg',
-    'images/pexels-kayode-balogun-169877002-12091126.jpg',
-
-    // Add more images as needed
+const heroTitle = heroSection ? heroSection.querySelector('h1') : null;
+const heroSlides = [
+    {
+        image: 'images/ucc.JPG',
+        title: '',
+        showText: false
+    },
+    {
+        image: 'images/Haruna.jpg',
+        title: '8,200 New Education Jobs Open as GES Recruitment Drive Begins',
+        showText: true
+    },
+    {
+        image: 'images/pexels-alaritammsalu-36078146.jpg',
+        title: 'Priority for Rural Service: Why Willingness to Serve in Deprived Areas Could Boost Your Chances',
+        showText: true
+    }
 ];
-let currentImageIndex = 0;
+let currentSlideIndex = 0;
 
-function changeBackground() {
-    heroSection.style.backgroundImage = `url('${images[currentImageIndex]}')`;
-    currentImageIndex = (currentImageIndex + 1) % images.length;
+function changeHeroSlide() {
+    if (!heroSection || !heroTitle || heroSlides.length === 0) {
+        return;
+    }
+
+    const currentSlide = heroSlides[currentSlideIndex];
+    heroSection.style.backgroundImage = `url('${currentSlide.image}')`;
+    
+    if (currentSlide.showText) {
+        heroTitle.textContent = currentSlide.title;
+        heroTitle.style.display = 'block';
+    } else {
+        heroTitle.style.display = 'none';
+    }
+    
+    currentSlideIndex = (currentSlideIndex + 1) % heroSlides.length;
 }
 
-// Set initial background
-changeBackground();
+if (heroSection && heroTitle) {
+    // Set initial slide
+    changeHeroSlide();
 
-// Change background every 10 seconds
-setInterval(changeBackground, 10000);
+    // Change slide every 10 seconds
+    setInterval(changeHeroSlide, 10000);
+}
 
 // Logo motion animation every 10 seconds
 const logoImg = document.querySelector('.logo img');
