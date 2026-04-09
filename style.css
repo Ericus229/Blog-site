@@ -1180,20 +1180,13 @@ footer {
         font-size: 1.1rem;
     }
 
-    /* Buttons */
+    /* Keep button sizing from base styles so global changes affect mobile too. */
     .cta-button,
     .download-btn {
-        padding: 0.85rem 1.5rem;
-        font-size: 1rem;
         width: auto;
         max-width: none;
         margin: 0;
         display: inline-block;
-    }
-
-    .hero .cta-button {
-        padding: 0.55rem 1rem;
-        font-size: 0.9rem;
     }
 
     /* Main Content */
@@ -1308,13 +1301,10 @@ footer {
 
     .cta-button,
     .download-btn {
-        padding: 0.8rem 1.5rem;
-        font-size: 1rem;
-    }
-
-    .hero .cta-button {
-        padding: 0.45rem 0.85rem;
-        font-size: 0.82rem;
+        width: auto;
+        max-width: none;
+        margin: 0;
+        display: inline-block;
     }
 
     /* Resource Cards */
@@ -1509,15 +1499,13 @@ footer {
         font-size: 1.1rem;
     }
 
-    /* Buttons */
+    /* Preserve base button sizing while keeping mobile-friendly alignment. */
     .cta-button,
     .download-btn {
-        padding: 1rem 2rem;
-        font-size: 1.1rem;
-        width: 100%;
-        max-width: 300px;
-        margin: 0 auto;
-        display: block;
+        width: auto;
+        max-width: none;
+        margin: 0;
+        display: inline-block;
     }
 
     /* Main Content */
