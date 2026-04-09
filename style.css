@@ -920,7 +920,7 @@ footer {
 /* Navigation Search */
 .search-bar {
     margin-left: auto;
-    margin-right: 1rem;
+    margin-right: 0;
     display: flex;
     align-items: center;
     gap: 0.5rem;
@@ -1410,10 +1410,10 @@ footer {
 .menu-toggle {
     display: none;
     background: transparent;
-    border: 1px solid rgba(255, 255, 255, 0.7);
+    border: 2px solid rgba(255, 255, 255, 0.85);
     border-radius: 6px;
-    width: 42px;
-    height: 42px;
+    width: 48px;
+    height: 48px;
     cursor: pointer;
     align-items: center;
     justify-content: center;
@@ -1631,16 +1631,17 @@ footer {
 
     .menu-toggle {
         display: inline-flex;
-        width: 36px;
-        height: 44px;
-        gap: 4px;
-        flex-basis: 100%;
+        width: 48px;
+        height: 48px;
+        gap: 5px;
+        flex-basis: auto;
         margin-top: 0.35rem;
         margin-left: 0;
     }
 
     .menu-toggle span {
-        width: 16px;
+        width: 22px;
+        height: 3px;
     }
 
     nav ul {
@@ -1747,9 +1748,9 @@ footer {
     }
 
     .search-bar {
-        width: 100%;
-        margin: 0.45rem 0 0;
-        justify-content: flex-start;
+        width: auto;
+        margin: 0.45rem 0 0 auto;
+        justify-content: flex-end;
     }
 
     .search-bar.open .search-field-wrap {
@@ -1845,6 +1846,18 @@ iframe {
     .download-grid {
         grid-template-columns: repeat(4, minmax(0, 1fr));
     }
+
+    .hero .cta-button,
+    .blog-feed .cta-button {
+        width: auto;
+        display: inline-block;
+        padding: 0.55rem 1rem;
+        font-size: 0.9rem;
+    }
+
+    .home-article-image {
+        max-height: 260px;
+    }
 }
 
 @media (min-width: 769px) and (max-width: 1024px) {
@@ -1866,6 +1879,16 @@ iframe {
         margin-left: auto;
     }
 
+    .header-social a {
+        width: 32px;
+        height: 32px;
+        font-size: 1rem;
+    }
+
+    .site-name {
+        font-size: 1.28rem;
+    }
+
     .content,
     .post-content {
         grid-template-columns: minmax(0, 1.65fr) minmax(240px, 1fr);
@@ -1884,6 +1907,26 @@ iframe {
         display: grid;
         grid-template-columns: repeat(2, minmax(0, 1fr));
         max-width: 760px;
+    }
+
+    .hero {
+        padding: 3.2rem 1rem;
+    }
+
+    .hero h1 {
+        font-size: 2.1rem;
+    }
+
+    .hero .cta-button,
+    .blog-feed .cta-button {
+        width: auto;
+        display: inline-block;
+        padding: 0.5rem 0.95rem;
+        font-size: 0.88rem;
+    }
+
+    .home-article-image {
+        max-height: 220px;
     }
 }
 
@@ -1913,5 +1956,11 @@ iframe {
 
     .social-links a {
         font-size: 0.82rem;
+    }
+
+    .hero .cta-button,
+    .blog-feed .cta-button {
+        width: auto;
+        display: inline-block;
     }
 }
