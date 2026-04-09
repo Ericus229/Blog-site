@@ -1815,3 +1815,103 @@ footer {
         max-width: 290px;
     }
 }
+
+/* Unified responsive overrides for desktop, tablet, and mobile */
+img,
+video,
+iframe {
+    max-width: 100%;
+    height: auto;
+}
+
+@media (min-width: 1025px) {
+    main,
+    .post-content,
+    .lesson-plan-section {
+        max-width: 1200px;
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    .content,
+    .post-content {
+        grid-template-columns: minmax(0, 2fr) minmax(280px, 1fr);
+    }
+
+    .resource-grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .download-grid {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+}
+
+@media (min-width: 769px) and (max-width: 1024px) {
+    nav {
+        flex-wrap: wrap;
+        row-gap: 0.75rem;
+    }
+
+    nav ul {
+        flex-wrap: wrap;
+        gap: 0.25rem 1rem;
+    }
+
+    nav ul li {
+        margin-left: 0;
+    }
+
+    .header-social {
+        margin-left: auto;
+    }
+
+    .content,
+    .post-content {
+        grid-template-columns: minmax(0, 1.65fr) minmax(240px, 1fr);
+        gap: 1.25rem;
+    }
+
+    .resource-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .download-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .home-tr-grid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        max-width: 760px;
+    }
+}
+
+@media (max-width: 768px) {
+    .content,
+    .post-content,
+    .contact-info,
+    .resource-grid,
+    .download-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .blog-feed article,
+    .sidebar,
+    .resource-card,
+    .download-card,
+    .contact-form-section,
+    .contact-info-section {
+        padding: 1rem;
+    }
+
+    .social-links {
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 0.5rem;
+    }
+
+    .social-links a {
+        font-size: 0.82rem;
+    }
+}
