@@ -85,12 +85,12 @@ const fallbackArticles = [
         url: 'UCC update.html'
     },
     {
-        title: '8,200 New Education Jobs Open as GES Recruitment Drive Begins',
-        url: 'GES update.html#new-teacher-recruitment-2026'
+        title: 'GES Vacancy Announcement: Teaching Positions Open for Qualified Graduates',
+        url: 'GES update.html#ges-vacancy-announcement-2026'
     },
     {
-        title: 'Priority for Rural Service: Why Willingness to Serve in Deprived Areas Could Boost Your Chances',
-        url: 'GES update.html#new-teacher-recruitment-2026'
+        title: 'GES Application Window: April 10 to 17, 2026',
+        url: 'GES update.html#ges-vacancy-announcement-2026'
     }
 ];
 
@@ -609,16 +609,16 @@ const heroSlides = [
         url: 'UCC update.html'
     },
     {
-        image: 'images/Haruna.jpg',
-        title: '8,200 New Education Jobs Open as GES Recruitment Drive Begins',
+        image: 'images/GES 1.JPG',
+        title: 'GES Vacancy Announcement: Teaching Positions Open',
         showText: true,
-        url: 'GES update.html#new-teacher-recruitment-2026'
+        url: 'GES update.html#ges-vacancy-announcement-2026'
     },
     {
-        image: 'images/pexels-alaritammsalu-36078146.jpg',
-        title: 'Priority for Rural Service: Why Willingness to Serve in Deprived Areas Could Boost Your Chances',
+        image: 'images/GES 2.JPG',
+        title: 'Apply by April 17, 2026 with required documents',
         showText: true,
-        url: 'GES update.html#new-teacher-recruitment-2026'
+        url: 'GES update.html#ges-vacancy-announcement-2026'
     }
 ];
 let currentSlideIndex = 0;
