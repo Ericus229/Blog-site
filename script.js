@@ -1,6 +1,17 @@
 // Set up navigation behavior
 const nav = document.querySelector('nav');
 const navMenu = nav ? nav.querySelector('ul') : null;
+const siteHeader = document.querySelector('header');
+
+function syncHeaderOffset() {
+    if (!siteHeader) {
+        return;
+    }
+
+    document.documentElement.style.setProperty('--header-offset', `${siteHeader.offsetHeight}px`);
+}
+
+syncHeaderOffset();
 
 if (nav && navMenu) {
     const menuToggle = document.createElement('button');
@@ -19,6 +30,7 @@ if (nav && navMenu) {
     menuToggle.addEventListener('click', function() {
         const isOpen = nav.classList.toggle('mobile-open');
         this.setAttribute('aria-expanded', isOpen.toString());
+        syncHeaderOffset();
     });
 
     const navLinks = navMenu.querySelectorAll('a');
@@ -27,6 +39,7 @@ if (nav && navMenu) {
             if (window.innerWidth <= 768) {
                 nav.classList.remove('mobile-open');
                 menuToggle.setAttribute('aria-expanded', 'false');
+                syncHeaderOffset();
             }
         });
     });
@@ -36,6 +49,8 @@ if (nav && navMenu) {
             nav.classList.remove('mobile-open');
             menuToggle.setAttribute('aria-expanded', 'false');
         }
+
+        syncHeaderOffset();
     });
 }
 
@@ -43,6 +58,9 @@ const searchBar = document.createElement('div');
 searchBar.className = 'search-bar';
 searchBar.innerHTML = '<button type="button" class="search-toggle-btn" aria-label="Open search" aria-expanded="false"><i class="fas fa-search" aria-hidden="true"></i></button><div class="search-field-wrap"><label for="search-input" style="display: none;">Search articles</label><input type="text" id="search-input" placeholder="Search articles..."><ul id="search-suggestions" class="search-suggestions" role="listbox" aria-label="Article suggestions"></ul></div>';
 nav.appendChild(searchBar);
+syncHeaderOffset();
+
+window.addEventListener('load', syncHeaderOffset);
 
 // Add back to top button
 const backToTopBtn = document.createElement('button');
@@ -437,16 +455,138 @@ if (resourceSearch) {
     });
 }
 
-// Share functionality
-const facebookShare = document.getElementById('facebook-share');
-const whatsappShare = document.getElementById('whatsapp-share');
-const linkedinShare = document.getElementById('linkedin-share');
+// Share functionality for article pages (bind each share section to its article URL)
+function slugifyArticleId(text) {
+    return text
+        .toLowerCase()
+        .trim()
+        .replace(/[^a-z0-9\s-]/g, '')
+        .replace(/\s+/g, '-')
+        .replace(/-+/g, '-')
+        .replace(/^-|-$/g, '');
+}
 
-if (facebookShare) {
-    const url = encodeURIComponent(window.location.href);
-    facebookShare.href = `https://www.facebook.com/sharer/sharer.php?u=${url}`;
-    whatsappShare.href = `https://wa.me/?text=${url}`;
-    linkedinShare.href = `https://www.linkedin.com/sharing/share-offsite/?url=${url}`;
+const articleSections = document.querySelectorAll('.blog-post');
+articleSections.forEach(function(article, index) {
+    if (!article.id) {
+        const heading = article.querySelector('h1, h2, h3');
+        const baseId = heading ? slugifyArticleId(heading.textContent || '') : '';
+        article.id = baseId || `article-${index + 1}`;
+    }
+
+    const shareLinks = article.querySelector('.share-links');
+    if (!shareLinks) {
+        return;
+    }
+
+    const articleUrl = `${window.location.origin}${window.location.pathname}#${article.id}`;
+    const encodedArticleUrl = encodeURIComponent(articleUrl);
+
+    const fbLink = shareLinks.querySelector('a[aria-label*="Facebook"]');
+    const waLink = shareLinks.querySelector('a[aria-label*="WhatsApp"]');
+    const liLink = shareLinks.querySelector('a[aria-label*="LinkedIn"]');
+
+    if (fbLink) {
+        fbLink.href = `https://www.facebook.com/sharer/sharer.php?u=${encodedArticleUrl}`;
+    }
+
+    if (waLink) {
+        waLink.href = `https://wa.me/?text=${encodedArticleUrl}`;
+    }
+
+    if (liLink) {
+        liLink.href = `https://www.linkedin.com/sharing/share-offsite/?url=${encodedArticleUrl}`;
+    }
+});
+
+// Home page article share menu (works for current and future .blog-feed articles)
+const homeBlogArticles = document.querySelectorAll('.blog-feed article');
+if (homeBlogArticles.length > 0) {
+    homeBlogArticles.forEach(function(article) {
+        const titleEl = article.querySelector('h2');
+        const readMoreLink = article.querySelector('a[href*=".html#"], a[href*="update.html#"], a[href*="Update.html#"], a[href*="University Update.html#"], a[href*="GES update.html#"], a[href*="NTC update.html#"]');
+        const articleTitle = titleEl ? titleEl.textContent.trim() : 'EduStream Article';
+        if (!readMoreLink) {
+            return;
+        }
+
+        const articleUrl = new URL(readMoreLink.getAttribute('href'), window.location.href).href;
+        const encodedUrl = encodeURIComponent(articleUrl);
+        const encodedText = encodeURIComponent(`${articleTitle} - ${articleUrl}`);
+
+        const shareWrap = document.createElement('div');
+        shareWrap.className = 'share-menu-wrap';
+
+        const shareBtn = document.createElement('button');
+        shareBtn.type = 'button';
+        shareBtn.className = 'cta-button share-toggle-btn';
+        shareBtn.textContent = 'Share';
+        shareBtn.setAttribute('aria-expanded', 'false');
+        shareBtn.setAttribute('aria-label', `Share ${articleTitle}`);
+
+        const shareMenu = document.createElement('div');
+        shareMenu.className = 'share-menu';
+
+        const whatsappLink = document.createElement('a');
+        whatsappLink.href = `https://wa.me/?text=${encodedText}`;
+        whatsappLink.target = '_blank';
+        whatsappLink.rel = 'noopener noreferrer';
+        whatsappLink.textContent = 'WhatsApp';
+
+        const facebookLink = document.createElement('a');
+        facebookLink.href = `https://www.facebook.com/sharer/sharer.php?u=${encodedUrl}`;
+        facebookLink.target = '_blank';
+        facebookLink.rel = 'noopener noreferrer';
+        facebookLink.textContent = 'Facebook';
+
+        const copyButton = document.createElement('button');
+        copyButton.type = 'button';
+        copyButton.className = 'share-copy-btn';
+        copyButton.textContent = 'Copy Link';
+
+        shareBtn.addEventListener('click', function(event) {
+            event.stopPropagation();
+            const isOpen = shareWrap.classList.toggle('open');
+            shareBtn.setAttribute('aria-expanded', isOpen.toString());
+        });
+
+        copyButton.addEventListener('click', function(event) {
+            event.stopPropagation();
+            const onSuccess = function() {
+                copyButton.textContent = 'Copied!';
+                setTimeout(function() {
+                    copyButton.textContent = 'Copy Link';
+                }, 1500);
+                shareWrap.classList.remove('open');
+                shareBtn.setAttribute('aria-expanded', 'false');
+            };
+
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(articleUrl).then(onSuccess).catch(function() {
+                    window.prompt('Copy this link:', articleUrl);
+                });
+            } else {
+                window.prompt('Copy this link:', articleUrl);
+            }
+        });
+
+        shareMenu.appendChild(whatsappLink);
+        shareMenu.appendChild(facebookLink);
+        shareMenu.appendChild(copyButton);
+        shareWrap.appendChild(shareBtn);
+        shareWrap.appendChild(shareMenu);
+        article.appendChild(shareWrap);
+    });
+
+    document.addEventListener('click', function() {
+        document.querySelectorAll('.share-menu-wrap.open').forEach(function(openWrap) {
+            const toggle = openWrap.querySelector('.share-toggle-btn');
+            openWrap.classList.remove('open');
+            if (toggle) {
+                toggle.setAttribute('aria-expanded', 'false');
+            }
+        });
+    });
 }
 
 // Hero background slideshow
