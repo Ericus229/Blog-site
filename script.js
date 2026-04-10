@@ -59,6 +59,10 @@ const blogArticles = document.querySelectorAll('.blog-feed article');
 
 const fallbackArticles = [
     {
+        title: 'UDS Applications Now Open for 2026/2027 Academic Year',
+        url: 'University Update.html#uds-admissions-2026-2027'
+    },
+    {
         title: 'UCC Admissions Portal Open for 2026/2027 Undergraduate Applications',
         url: 'University Update.html#ucc-admissions-2026-2027'
     },
@@ -450,22 +454,39 @@ const heroSection = document.querySelector('.hero');
 const heroTitle = heroSection ? heroSection.querySelector('h1') : null;
 const heroSlides = [
     {
+        image: 'images/uds.JPG',
+        title: 'UDS Applications Now Open for 2026/2027',
+        showText: true,
+        url: 'University Update.html#uds-admissions-2026-2027'
+    },
+    {
         image: 'images/ucc.JPG',
-        title: '',
-        showText: false
+        title: 'UCC Admissions Portal Open for 2026/2027',
+        showText: true,
+        url: 'University Update.html#ucc-admissions-2026-2027'
     },
     {
         image: 'images/Haruna.jpg',
         title: '8,200 New Education Jobs Open as GES Recruitment Drive Begins',
-        showText: true
+        showText: true,
+        url: 'GES update.html#new-teacher-recruitment-2026'
     },
     {
         image: 'images/pexels-alaritammsalu-36078146.jpg',
         title: 'Priority for Rural Service: Why Willingness to Serve in Deprived Areas Could Boost Your Chances',
-        showText: true
+        showText: true,
+        url: 'GES update.html#new-teacher-recruitment-2026'
     }
 ];
 let currentSlideIndex = 0;
+
+// Create a persistent Read More button inside the hero
+const heroReadMore = document.createElement('a');
+heroReadMore.className = 'cta-button hero-read-more';
+heroReadMore.textContent = 'Read More';
+if (heroSection) {
+    heroSection.appendChild(heroReadMore);
+}
 
 function changeHeroSlide() {
     if (!heroSection || !heroTitle || heroSlides.length === 0) {
@@ -474,14 +495,21 @@ function changeHeroSlide() {
 
     const currentSlide = heroSlides[currentSlideIndex];
     heroSection.style.backgroundImage = `url('${currentSlide.image}')`;
-    
+
     if (currentSlide.showText) {
         heroTitle.textContent = currentSlide.title;
         heroTitle.style.display = 'block';
     } else {
         heroTitle.style.display = 'none';
     }
-    
+
+    if (currentSlide.url) {
+        heroReadMore.href = currentSlide.url;
+        heroReadMore.style.display = 'inline-block';
+    } else {
+        heroReadMore.style.display = 'none';
+    }
+
     currentSlideIndex = (currentSlideIndex + 1) % heroSlides.length;
 }
 
