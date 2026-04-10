@@ -78,11 +78,11 @@ const blogArticles = document.querySelectorAll('.blog-feed article');
 const fallbackArticles = [
     {
         title: 'UDS Applications Now Open for 2026/2027 Academic Year',
-        url: 'University Update.html#uds-admissions-2026-2027'
+        url: 'UDS update.html'
     },
     {
         title: 'UCC Admissions Portal Open for 2026/2027 Undergraduate Applications',
-        url: 'University Update.html#ucc-admissions-2026-2027'
+        url: 'UCC update.html'
     },
     {
         title: '8,200 New Education Jobs Open as GES Recruitment Drive Begins',
@@ -479,7 +479,10 @@ articleSections.forEach(function(article, index) {
         return;
     }
 
-    const articleUrl = `${window.location.origin}${window.location.pathname}#${article.id}`;
+    const customSharePath = article.getAttribute('data-share-url');
+    const articleUrl = customSharePath
+        ? new URL(customSharePath, window.location.href).href
+        : `${window.location.origin}${window.location.pathname}#${article.id}`;
     const encodedArticleUrl = encodeURIComponent(articleUrl);
 
     const fbLink = shareLinks.querySelector('a[aria-label*="Facebook"]');
@@ -504,7 +507,7 @@ const homeBlogArticles = document.querySelectorAll('.blog-feed article');
 if (homeBlogArticles.length > 0) {
     homeBlogArticles.forEach(function(article) {
         const titleEl = article.querySelector('h2');
-        const readMoreLink = article.querySelector('a[href*=".html#"], a[href*="update.html#"], a[href*="Update.html#"], a[href*="University Update.html#"], a[href*="GES update.html#"], a[href*="NTC update.html#"]');
+        const readMoreLink = article.querySelector('a[href*="update.html"], a[href*="Update.html"], a[href*=".html#"]');
         const articleTitle = titleEl ? titleEl.textContent.trim() : 'EduStream Article';
         if (!readMoreLink) {
             return;
@@ -597,13 +600,13 @@ const heroSlides = [
         image: 'images/uds.JPG',
         title: 'UDS Applications Now Open for 2026/2027',
         showText: true,
-        url: 'University Update.html#uds-admissions-2026-2027'
+        url: 'UDS update.html'
     },
     {
         image: 'images/ucc.JPG',
         title: 'UCC Admissions Portal Open for 2026/2027',
         showText: true,
-        url: 'University Update.html#ucc-admissions-2026-2027'
+        url: 'UCC update.html'
     },
     {
         image: 'images/Haruna.jpg',
