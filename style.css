@@ -887,6 +887,87 @@ footer {
     color: #003366;
 }
 
+.suggestions-section {
+    margin-top: 2rem;
+    border-top: 1px solid #d3d3d3;
+    padding-top: 1.2rem;
+}
+
+.suggestions-section h3 {
+    color: #003366;
+    margin-bottom: 0.45rem;
+}
+
+.suggestions-note {
+    color: #555;
+    margin-bottom: 1rem;
+}
+
+.suggestion-form {
+    display: grid;
+    gap: 0.75rem;
+    margin-bottom: 1.1rem;
+}
+
+.suggestion-form label {
+    display: grid;
+    gap: 0.35rem;
+    color: #05364d;
+    font-weight: 600;
+}
+
+.suggestion-form input,
+.suggestion-form textarea {
+    width: 100%;
+    border: 1px solid #cad5e1;
+    border-radius: 8px;
+    padding: 0.6rem 0.7rem;
+    font: inherit;
+}
+
+.suggestion-form textarea {
+    resize: vertical;
+    min-height: 110px;
+}
+
+.suggestion-form .cta-button {
+    width: fit-content;
+    border: none;
+    cursor: pointer;
+}
+
+.suggestion-status {
+    min-height: 1.2rem;
+    color: #006f5e;
+    font-size: 0.95rem;
+}
+
+.suggestions-list {
+    list-style: none;
+    display: grid;
+    gap: 0.8rem;
+}
+
+.suggestion-item,
+.suggestion-empty {
+    border: 1px solid #d8e2ec;
+    border-radius: 8px;
+    background: #f9fcff;
+    padding: 0.75rem 0.85rem;
+}
+
+.suggestion-meta {
+    color: #4d6375;
+    font-size: 0.84rem;
+    margin-bottom: 0.3rem;
+}
+
+.suggestion-text {
+    color: #0f202e;
+    white-space: pre-wrap;
+    word-break: break-word;
+}
+
 /* Dark mode for blog post */
 .dark-mode .blog-post h1 {
     color: #ffffff;
@@ -923,6 +1004,38 @@ footer {
 
 .dark-mode .related-posts a {
     color: #ffffff;
+}
+
+.dark-mode .suggestions-section {
+    border-top-color: #333;
+}
+
+.dark-mode .suggestions-section h3 {
+    color: #ffffff;
+}
+
+.dark-mode .suggestions-note,
+.dark-mode .suggestion-form label,
+.dark-mode .suggestion-meta,
+.dark-mode .suggestion-text {
+    color: #d3d3d3;
+}
+
+.dark-mode .suggestion-form input,
+.dark-mode .suggestion-form textarea {
+    background-color: #1f1f1f;
+    border-color: #3e3e3e;
+    color: #ffffff;
+}
+
+.dark-mode .suggestion-item,
+.dark-mode .suggestion-empty {
+    background: #1a1a1a;
+    border-color: #363636;
+}
+
+.dark-mode .suggestion-status {
+    color: #9ddfc7;
 }
 
 /* Contact Page Styles */

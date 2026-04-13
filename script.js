@@ -77,6 +77,10 @@ const blogArticles = document.querySelectorAll('.blog-feed article');
 
 const fallbackArticles = [
     {
+        title: 'GETFund Opens 2026/2027 Postgraduate Foreign Scholarship Applications',
+        url: 'University Update.html#getfund-postgraduate-foreign-scholarship-2026-2027'
+    },
+    {
         title: 'UDS Applications Now Open for 2026/2027 Academic Year',
         url: 'UDS update.html'
     },
@@ -597,6 +601,12 @@ const heroSection = document.querySelector('.hero');
 const heroTitle = heroSection ? heroSection.querySelector('h1') : null;
 const heroSlides = [
     {
+        image: 'scholarship.JPG',
+        title: 'GETFund Foreign Scholarship Applications Open',
+        showText: true,
+        url: 'University Update.html#getfund-postgraduate-foreign-scholarship-2026-2027'
+    },
+    {
         image: 'images/uds.JPG',
         title: 'UDS Applications Now Open for 2026/2027',
         showText: true,
@@ -663,6 +673,147 @@ if (heroSection && heroTitle) {
     // Change slide every 10 seconds
     setInterval(changeHeroSlide, 10000);
 }
+
+// Shared comments widget for all article pages
+const SUGGESTIONS_STORAGE_KEY = 'edustream-shared-suggestions-v1';
+const MAX_SUGGESTIONS = 30;
+
+function readSuggestions() {
+    try {
+        const saved = localStorage.getItem(SUGGESTIONS_STORAGE_KEY);
+        if (!saved) {
+            return [];
+        }
+
+        const parsed = JSON.parse(saved);
+        return Array.isArray(parsed) ? parsed : [];
+    } catch (error) {
+        return [];
+    }
+}
+
+function writeSuggestions(items) {
+    try {
+        localStorage.setItem(SUGGESTIONS_STORAGE_KEY, JSON.stringify(items.slice(0, MAX_SUGGESTIONS)));
+    } catch (error) {
+        // Ignore storage failures so the page remains usable.
+    }
+}
+
+function formatSuggestionDate(isoDate) {
+    const date = new Date(isoDate);
+    if (Number.isNaN(date.getTime())) {
+        return 'Just now';
+    }
+
+    return date.toLocaleString();
+}
+
+function renderSuggestionsList(listEl, suggestions) {
+    listEl.innerHTML = '';
+
+    if (suggestions.length === 0) {
+        const emptyItem = document.createElement('li');
+        emptyItem.className = 'suggestion-empty';
+        emptyItem.textContent = 'No suggestions yet. Be the first to share one.';
+        listEl.appendChild(emptyItem);
+        return;
+    }
+
+    suggestions.forEach(function(item) {
+        const row = document.createElement('li');
+        row.className = 'suggestion-item';
+
+        const meta = document.createElement('p');
+        meta.className = 'suggestion-meta';
+        meta.textContent = `${item.name} | ${formatSuggestionDate(item.createdAt)}${item.articleTitle ? ` | ${item.articleTitle}` : ''}`;
+
+        const body = document.createElement('p');
+        body.className = 'suggestion-text';
+        body.textContent = item.message;
+
+        row.appendChild(meta);
+        row.appendChild(body);
+        listEl.appendChild(row);
+    });
+}
+
+function mountArticleSuggestionBox(article) {
+    if (article.querySelector('.suggestions-section')) {
+        return;
+    }
+
+    const articleHeading = article.querySelector('h1, h2, h3');
+    const articleTitle = articleHeading ? articleHeading.textContent.trim() : 'Article';
+
+    const section = document.createElement('section');
+    section.className = 'suggestions-section';
+    section.setAttribute('aria-label', 'Suggestion section');
+    section.innerHTML = `
+        <h3>Suggestions & Comments</h3>
+        <p class="suggestions-note">Share ideas and feedback. Suggestions submitted here appear across all article pages.</p>
+        <form class="suggestion-form">
+            <label>
+                Name
+                <input type="text" name="name" maxlength="40" placeholder="Your name" required>
+            </label>
+            <label>
+                Suggestion
+                <textarea name="message" rows="4" maxlength="400" placeholder="Share your suggestion..." required></textarea>
+            </label>
+            <button type="submit" class="cta-button">Post Suggestion</button>
+            <p class="suggestion-status" aria-live="polite"></p>
+        </form>
+        <ul class="suggestions-list" aria-label="Submitted suggestions"></ul>
+    `;
+
+    article.appendChild(section);
+
+    const form = section.querySelector('.suggestion-form');
+    const statusEl = section.querySelector('.suggestion-status');
+    const listEl = section.querySelector('.suggestions-list');
+    if (!form || !statusEl || !listEl) {
+        return;
+    }
+
+    renderSuggestionsList(listEl, readSuggestions());
+
+    form.addEventListener('submit', function(event) {
+        event.preventDefault();
+
+        const formData = new FormData(form);
+        const name = String(formData.get('name') || '').trim();
+        const message = String(formData.get('message') || '').trim();
+
+        if (!name || !message) {
+            statusEl.textContent = 'Please enter your name and suggestion.';
+            return;
+        }
+
+        const nextSuggestions = [
+            {
+                name,
+                message,
+                articleTitle,
+                createdAt: new Date().toISOString()
+            },
+            ...readSuggestions()
+        ].slice(0, MAX_SUGGESTIONS);
+
+        writeSuggestions(nextSuggestions);
+
+        document.querySelectorAll('.suggestions-list').forEach(function(sharedList) {
+            renderSuggestionsList(sharedList, nextSuggestions);
+        });
+
+        form.reset();
+        statusEl.textContent = 'Thanks. Your suggestion has been posted.';
+    });
+}
+
+articleSections.forEach(function(article) {
+    mountArticleSuggestionBox(article);
+});
 
 // Logo motion animation every 10 seconds
 const logoImg = document.querySelector('.logo img');

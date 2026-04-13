@@ -4,6 +4,16 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Read our latest educational blog post.">
+    <meta property="og:type" content="article">
+    <meta property="og:title" content="Blog Post Title - EduStream">
+    <meta property="og:description" content="Read our latest educational blog post.">
+    <meta property="og:image" content="images/EdustreamLogo.png">
+    <meta property="og:image:alt" content="EduStream article cover image">
+    <meta property="og:url" content="Post-template.html">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Blog Post Title - EduStream">
+    <meta name="twitter:description" content="Read our latest educational blog post.">
+    <meta name="twitter:image" content="images/EdustreamLogo.png">
     <title>Blog Post Title - EduStream</title>
     <link rel="stylesheet" href="style.css?v=20260409">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -35,9 +45,14 @@
 
     <main>
         <div class="post-content">
-            <article class="blog-post">
+            <article class="blog-post" data-share-url="Post-template.html">
                 <h1>Sample Blog Post Title</h1>
                 <p class="date-posted">Date Posted: April 7, 2026</p>
+
+                <figure class="article-feature-image">
+                    <img src="images/EdustreamLogo.png" alt="Sample article cover image" onerror="this.closest('figure').style.display='none'">
+                    <figcaption>Replace this with a caption that describes your article image.</figcaption>
+                </figure>
                 <div class="post-body">
                     <p>Education is the cornerstone of personal and societal development. In today's rapidly evolving world, the ability to learn and adapt is more crucial than ever. This article explores the fundamental principles of effective learning strategies that can empower students to achieve their full potential.</p>
                     
@@ -81,15 +96,14 @@
 
     <footer>
         <div class="social-links">
-            <a href=\"https://facebook.com/edustream\" aria-label=\"Facebook\" target=\"_blank\"><i class=\"fab fa-facebook-f\"></i> Facebook</a>
-            <a href=\"https://wa.me/1234567890\" aria-label=\"WhatsApp\" target=\"_blank\"><i class=\"fab fa-whatsapp\"></i> WhatsApp</a>
-            <a href=\"https://linkedin.com/company/edustream\" aria-label=\"LinkedIn\" target=\"_blank\"><i class=\"fab fa-linkedin-in\"></i> LinkedIn</a>
+            <a href="https://facebook.com/edustream" aria-label="Facebook" target="_blank"><i class="fab fa-facebook-f"></i> Facebook</a>
+            <a href="https://wa.me/1234567890" aria-label="WhatsApp" target="_blank"><i class="fab fa-whatsapp"></i> WhatsApp</a>
+            <a href="https://linkedin.com/company/edustream" aria-label="LinkedIn" target="_blank"><i class="fab fa-linkedin-in"></i> LinkedIn</a>
         </div>
         <p>&copy; 2026 EduStream. All rights reserved.</p>
     </footer>
 
     <script src="script.js?v=20260409"></script>
 </body>
-</html></content>
-<parameter name="filePath">c:\Users\MCCDC\Desktop\Blog site\post-template.html
+</html>
 
