@@ -53,4 +53,3 @@ To run this project locally using Visual Studio Code and the Live Server extensi
 ## License
 
 This project is licensed under the MIT License. See the [MIT License](MIT%20License) file for details.
-<img src="https://t.bkit.co/w_69df8475cab3e.gif" />
